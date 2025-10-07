@@ -397,12 +397,10 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script>
-    // ---- USER CONTEXT CHECK ----
     const userData = JSON.parse(localStorage.getItem("user") || "null");
     if (!userData) { window.location.href = "login.html"; }
     const isAdmin = userData.role === "admin";
     const currentUser = userData.name;
-
     function pad2(n){return String(n).padStart(2,'0');}
     function formatTime(sec) {
       const h = String(Math.floor(sec/3600)).padStart(2,'0');
@@ -422,33 +420,26 @@
     const newDriverName = document.getElementById('newDriverName');
     const addDriverBtn = document.getElementById('addDriverBtn');
     const driverBoard = document.getElementById('driverBoard');
-    const driverAddBar = document.getElementById('driverAddBar');
-    if (!isAdmin) { driverAddBar.style.display = "none"; }
-
     document.getElementById("showReportsBtn").onclick = () => { window.location.href = "reports.html"; };
     document.getElementById("logoutBtn").onclick = () => { document.getElementById("logoutModalBg").classList.add('active'); setTimeout(() => { document.getElementById("confirmLogoutBtn").focus(); }, 100);}
     document.getElementById("cancelLogoutBtn").onclick = () => { document.getElementById("logoutModalBg").classList.remove('active'); };
     document.getElementById("logoutModalBg").onclick = function(e) { if (e.target === document.getElementById("logoutModalBg")) document.getElementById("logoutModalBg").classList.remove('active'); };
     document.getElementById("confirmLogoutBtn").onclick = function() { localStorage.removeItem('user'); window.location.href = "login.html"; };
 
-    // Add driver (admin only)
-    if (isAdmin) {
-      addDriverBtn.onclick = () => {
-        const name = newDriverName.value.trim();
-        if (!name) return;
-        const exists = Object.values(drivers).some(d => d.name.toLowerCase() === name.toLowerCase());
-        if (exists) return alert("Driver already exists.");
-        const id = db.ref("drivers").push().key;
-        db.ref("drivers/" + id).set({
-          name,
-          date: new Date().toISOString().slice(0,10)
-        });
-        newDriverName.value = '';
-      };
-      newDriverName.addEventListener("keypress", e => { if (e.key === "Enter") addDriverBtn.click(); });
-    }
+    addDriverBtn.onclick = () => {
+      const name = newDriverName.value.trim();
+      if (!name) return;
+      const exists = Object.values(drivers).some(d => d.name.toLowerCase() === name.toLowerCase());
+      if (exists) return alert("Driver already exists.");
+      const id = db.ref("drivers").push().key;
+      db.ref("drivers/" + id).set({
+        name,
+        date: new Date().toISOString().slice(0,10)
+      });
+      newDriverName.value = '';
+    };
+    newDriverName.addEventListener("keypress", e => { if (e.key === "Enter") addDriverBtn.click(); });
 
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCirYQ_46JiSkMIwCNs1nSi89dvB1MUg_A",
       authDomain: "deliverylog12.firebaseapp.com",
@@ -488,8 +479,6 @@
         return;
       }
       driverArr.forEach(([driverId, driverObj]) => {
-        // Only show own card to drivers
-        if (!isAdmin && driverObj.name !== currentUser) return;
         if (!driverState[driverId]) driverState[driverId] = {
           kmIn: "",
           kmOut: "",
@@ -529,19 +518,14 @@
             dateEl.value = s.date;
           }
         };
-        if (isAdmin) {
-          const delBtn = document.createElement('button');
-          delBtn.className = 'driver-delete';
-          delBtn.title = "Remove driver";
-          delBtn.innerHTML = "<i class='fas fa-trash'></i>";
-          delBtn.onclick = () => showConfirmModal(driverId, driverObj.name);
-          headerRow.appendChild(nameEl);
-          headerRow.appendChild(dateEl);
-          headerRow.appendChild(delBtn);
-        } else {
-          headerRow.appendChild(nameEl);
-          headerRow.appendChild(dateEl);
-        }
+        const delBtn = document.createElement('button');
+        delBtn.className = 'driver-delete';
+        delBtn.title = "Remove driver";
+        delBtn.innerHTML = "<i class='fas fa-trash'></i>";
+        delBtn.onclick = () => showConfirmModal(driverId, driverObj.name);
+        headerRow.appendChild(nameEl);
+        headerRow.appendChild(dateEl);
+        headerRow.appendChild(delBtn);
         card.appendChild(headerRow);
 
         const fieldsRow = document.createElement('div');
@@ -624,7 +608,6 @@
         renderKmResult();
         card.appendChild(kmResult);
 
-        // TIMER BAR
         const timerBar = document.createElement('div');
         timerBar.className = 'driver-timer-bar';
         const timerDisplay = document.createElement('span');
@@ -707,7 +690,6 @@
 
         driverBoard.appendChild(card);
 
-        // Stop timer and reset to 0 on ANY device if stopped is true!
         if (s.running && s.startTime && !s.stopped) {
           if (!s.timerInterval) {
             s.timerInterval = setInterval(() => {
@@ -756,8 +738,7 @@
 
     setInterval(() => {
       Array.from(driverBoard.children).forEach((card, i) => {
-        const visibleDrivers = Object.entries(drivers).filter(([driverId, driverObj]) => isAdmin || driverObj.name === currentUser);
-        const driverId = visibleDrivers[i] && visibleDrivers[i][0];
+        const driverId = Object.keys(drivers)[i];
         const s = driverState[driverId];
         if (!s) return;
         const btns = card.querySelectorAll('.driver-btns button');
