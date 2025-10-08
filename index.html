@@ -235,12 +235,8 @@
   <div class="page-wrapper">
     <div class="header">
       <div class="header-row">
-        <span class="header-title">
-          <i class="fas fa-car"></i> Delivery Drivers Log
-        </span>
-        <span class="header-desc">
-          Ravintola Tandoori Villa &nbsp;|&nbsp; Log car drivers' shift kilometers and time daily
-        </span>
+        <span class="header-title"><i class="fas fa-car"></i> Delivery Drivers Log</span>
+        <span class="header-desc">Ravintola Tandoori Villa &nbsp;|&nbsp; Log car drivers' shift kilometers and time daily</span>
       </div>
       <div class="header-btnbar">
         <button class="reports-btn" id="showReportsBtn"><i class="fas fa-road"></i> Show KM Reports</button>
@@ -278,9 +274,11 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script>
+    // Auth
     const userData = JSON.parse(localStorage.getItem("user") || "null");
     if (!userData) { window.location.href = "login.html"; }
     const currentUser = userData.name;
+    // Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyCirYQ_46JiSkMIwCNs1nSi89dvB1MUg_A",
       authDomain: "deliverylog12.firebaseapp.com",
@@ -295,20 +293,6 @@
     const db = firebase.database();
     let allUsers = {};
     let driverState = {};
-    function showModal(details) {
-      document.getElementById('modalDetails').innerHTML = details;
-      document.getElementById('modalBg').classList.add('active');
-      setTimeout(() => { document.getElementById('modalDone').focus(); }, 100);
-    }
-    function hideModal() { document.getElementById('modalBg').classList.remove('active'); }
-    document.getElementById('modalClose').onclick = hideModal;
-    document.getElementById('modalDone').onclick = hideModal;
-    document.getElementById('modalBg').onclick = function(e) { if (e.target === document.getElementById('modalBg')) hideModal(); };
-    document.getElementById("showReportsBtn").onclick = () => { window.location.href = "reports.html"; };
-    document.getElementById("logoutBtn").onclick = () => { document.getElementById("logoutModalBg").classList.add('active'); setTimeout(() => { document.getElementById("confirmLogoutBtn").focus(); }, 100);}
-    document.getElementById("cancelLogoutBtn").onclick = () => { document.getElementById("logoutModalBg").classList.remove('active'); };
-    document.getElementById("logoutModalBg").onclick = function(e) { if (e.target === document.getElementById("logoutModalBg")) document.getElementById("logoutModalBg").classList.remove('active'); };
-    document.getElementById("confirmLogoutBtn").onclick = function() { localStorage.removeItem('user'); window.location.href = "login.html"; };
     db.ref("users").on("value", snap => {
       allUsers = snap.val() || {};
       renderDrivers();
@@ -362,7 +346,7 @@
       headerRow.className = 'driver-card-header';
       const nameEl = document.createElement('span');
       nameEl.className = 'driver-name';
-      nameEl.textContent = currentUser;
+      nameEl.textContent = allUsers[userId].name;
       const dateEl = document.createElement('input');
       dateEl.type = 'date';
       dateEl.className = 'driver-date';
@@ -404,11 +388,6 @@
         updateDriverState(userId);
         renderDrivers();
       };
-      kmIn.onblur = function() {
-        s.kmIn = this.value;
-        updateDriverState(userId);
-        renderDrivers();
-      };
       const kmInUnit = document.createElement('span');
       kmInUnit.className = 'km-unit';
       kmInUnit.textContent = "Km";
@@ -430,11 +409,6 @@
         updateDriverState(userId);
         renderDrivers();
       };
-      kmOut.onblur = function() {
-        s.kmOut = this.value;
-        updateDriverState(userId);
-        renderDrivers();
-      };
       const kmOutUnit = document.createElement('span');
       kmOutUnit.className = 'km-unit';
       kmOutUnit.textContent = "Km";
@@ -449,7 +423,6 @@
         kmResult.innerHTML = `<i class="fas fa-road"></i> Today: <span style="font-weight:900;color:var(--primary)">` + (+s.kmOut - +s.kmIn) + ` km</span>`;
       } else { kmResult.textContent = ''; }
       card.appendChild(kmResult);
-      // TIMER BAR
       const timerBar = document.createElement('div');
       timerBar.className = 'driver-timer-bar';
       const timerDisplay = document.createElement('span');
@@ -505,14 +478,14 @@
         s.timerInterval = null;
         card.classList.remove('active');
         showModal(
-          `<b><i class="fas fa-user"></i> ${currentUser}</b><br>
+          `<b><i class="fas fa-user"></i> ${allUsers[userId].name}</b><br>
           <span style="color:#fff;">${toDisplayDate(s.date)}</span><br>
           <span style="color:var(--primary)">Total: ${+s.kmOut - +s.kmIn} km</span><br>
           <span>Time: ${formatTime(s.timer)}</span>`
         );
         db.ref("logs").push({
           date: s.date,
-          name: currentUser,
+          name: allUsers[userId].name,
           kmIn: s.kmIn,
           kmOut: s.kmOut,
           totalKm: (+s.kmOut - +s.kmIn).toString(),
@@ -527,7 +500,7 @@
       btns.appendChild(stopBtn);
       card.appendChild(btns);
       driverBoard.appendChild(card);
-      // Timer
+
       if (s.running && s.startTime && !s.stopped) {
         if (!s.timerInterval) {
           s.timerInterval = setInterval(() => {
@@ -545,7 +518,8 @@
         timerDisplay.textContent = formatTime(s.timer || 0);
       }
     }
-    setInterval(() => { renderDrivers(); }, 350);
+  }
+  setInterval(() => { renderDrivers(); }, 350);
   </script>
 </body>
 </html>
