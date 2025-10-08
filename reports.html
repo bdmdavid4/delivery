@@ -358,13 +358,7 @@
     </div>
   </div>
   <div class="reports-bar">
-    <div class="row1" id="driverSelectRow">
-      <label for="driverSelect">Select Driver:</label>
-      <select id="driverSelect"><option value="">-- Select Driver --</option></select>
-      <button id="dailyBtn">Daily</button>
-      <button id="weeklyBtn">Last 7 Days</button>
-      <button id="monthlyBtn">Monthly</button>
-    </div>
+    <div class="row1" id="driverSelectRow" style="display:none"></div>
     <div class="row2" id="customRangeArea" style="display: flex;">
       <label>From</label>
       <input type="date" id="fromDate"/>
@@ -376,9 +370,13 @@
       <label for="monthSelect">Select Month:</label>
       <select id="monthSelect"></select>
     </div>
+    <div class="row1" style="justify-content:center;">
+      <button id="dailyBtn">Daily</button>
+      <button id="weeklyBtn">Last 7 Days</button>
+      <button id="monthlyBtn">Monthly</button>
+    </div>
   </div>
   <div id="tablesArea"></div>
-  <!-- Modals -->
   <div class="modal-bg" id="modalBg">
     <div class="modal-content" id="modalContent">
       <button class="modal-close" id="modalClose" title="Close">&times;</button>
@@ -401,11 +399,68 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
+  // Auth and Firebase
   const userData = JSON.parse(localStorage.getItem("user") || "null");
   if (!userData) { window.location.href = "login.html"; }
-  const isAdmin = userData.role === "admin";
   const currentUser = userData.name;
+  const firebaseConfig = {
+    apiKey: "AIzaSyCirYQ_46JiSkMIwCNs1nSi89dvB1MUg_A",
+    authDomain: "deliverylog12.firebaseapp.com",
+    databaseURL: "https://deliverylog12-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "deliverylog12",
+    storageBucket: "deliverylog12.firebasestorage.app",
+    messagingSenderId: "19081371357",
+    appId: "1:19081371357:web:b9b59e732a4d90d4d44534",
+    measurementId: "G-FSZXXZQSL0"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  // Modal logic
+  function showModal(title, details) {
+    document.getElementById('modalTitle').innerHTML = title;
+    document.getElementById('modalDetails').innerHTML = details;
+    document.getElementById('modalBg').classList.add('active');
+    setTimeout(() => { document.getElementById('modalDone').focus(); }, 100);
+  }
+  function hideModal() { document.getElementById('modalBg').classList.remove('active'); }
+  document.getElementById('modalClose').onclick = hideModal;
+  document.getElementById('modalDone').onclick = hideModal;
+  document.getElementById('modalBg').onclick = function(e){ if(e.target===document.getElementById('modalBg')) hideModal(); };
+  let pendingDelete = null;
+  function showConfirmModal(title, details, onConfirm) {
+    document.getElementById('confirmModalTitle').innerHTML = title;
+    document.getElementById('confirmModalDetails').innerHTML = details;
+    document.getElementById('confirmModalBg').classList.add('active');
+    pendingDelete = onConfirm;
+    setTimeout(() => { document.getElementById('confirmDeleteBtn').focus(); }, 100);
+  }
+  function hideConfirmModal() { document.getElementById('confirmModalBg').classList.remove('active'); pendingDelete=null; }
+  document.getElementById('cancelDeleteBtn').onclick = hideConfirmModal;
+  document.getElementById('confirmModalBg').onclick = function(e){ if(e.target===document.getElementById('confirmModalBg')) hideConfirmModal(); };
+  document.getElementById('confirmDeleteBtn').onclick = function(){
+    if(pendingDelete){ pendingDelete(); hideConfirmModal(); }
+  };
+  document.getElementById('backHomeBtn').onclick = () => { window.location.href = "index.html"; };
 
+  // Data and helpers
+  let allLogs = {};
+  let currentMode = "daily";
+  let currentPage = 1;
+  let rowsPerPage = {daily:15, weekly:15, monthly:9999, custom:15};
+  let totalPages = 1;
+  let currentMonth = "";
+  let filteredLogs = [];
+  const tablesArea = document.getElementById('tablesArea');
+  const dailyBtn = document.getElementById('dailyBtn');
+  const weeklyBtn = document.getElementById('weeklyBtn');
+  const monthlyBtn = document.getElementById('monthlyBtn');
+  const customBtn = document.getElementById('customBtn');
+  const fromDate = document.getElementById('fromDate');
+  const toDate = document.getElementById('toDate');
+  const customRangeArea = document.getElementById('customRangeArea');
+  const monthSelectArea = document.getElementById('monthSelectArea');
+  const monthSelect = document.getElementById('monthSelect');
+  // Helpers
   function pad2(n){return String(n).padStart(2,'0');}
   function formatTime(sec) {
     if (!sec) sec = 0;
@@ -422,149 +477,11 @@
     return `${pad2(d)}/${months[mIndex]}/${y}`;
   }
   function todayISO() { return new Date().toISOString().slice(0,10);}
-  function parseDate(d) { return new Date(d);}
   function addDays(d, n) {
     let dt = new Date(d);
     dt.setDate(dt.getDate()+n);
     return dt.toISOString().slice(0,10);
   }
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCirYQ_46JiSkMIwCNs1nSi89dvB1MUg_A",
-    authDomain: "deliverylog12.firebaseapp.com",
-    databaseURL: "https://deliverylog12-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "deliverylog12",
-    storageBucket: "deliverylog12.firebasestorage.app",
-    messagingSenderId: "19081371357",
-    appId: "1:19081371357:web:b9b59e732a4d90d4d44534",
-    measurementId: "G-FSZXXZQSL0"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  function showModal(title, details) {
-    document.getElementById('modalTitle').innerHTML = title;
-    document.getElementById('modalDetails').innerHTML = details;
-    document.getElementById('modalBg').classList.add('active');
-    setTimeout(() => { document.getElementById('modalDone').focus(); }, 100);
-  }
-  function hideModal() { document.getElementById('modalBg').classList.remove('active'); }
-  document.getElementById('modalClose').onclick = hideModal;
-  document.getElementById('modalDone').onclick = hideModal;
-  document.getElementById('modalBg').onclick = function(e){ if(e.target===document.getElementById('modalBg')) hideModal(); };
-
-  let pendingDelete = null;
-  function showConfirmModal(title, details, onConfirm) {
-    document.getElementById('confirmModalTitle').innerHTML = title;
-    document.getElementById('confirmModalDetails').innerHTML = details;
-    document.getElementById('confirmModalBg').classList.add('active');
-    pendingDelete = onConfirm;
-    setTimeout(() => { document.getElementById('confirmDeleteBtn').focus(); }, 100);
-  }
-  function hideConfirmModal() { document.getElementById('confirmModalBg').classList.remove('active'); pendingDelete=null; }
-  document.getElementById('cancelDeleteBtn').onclick = hideConfirmModal;
-  document.getElementById('confirmModalBg').onclick = function(e){ if(e.target===document.getElementById('confirmModalBg')) hideConfirmModal(); };
-  document.getElementById('confirmDeleteBtn').onclick = function(){
-    if(pendingDelete){ pendingDelete(); hideConfirmModal(); }
-  };
-
-  document.getElementById('backHomeBtn').onclick = () => { window.location.href = "index.html"; };
-
-  let allDrivers = {};
-  let allLogs = {};
-  let selectedDriver = "";
-  let filteredLogs = [];
-  let currentMode = "daily";
-  let currentPage = 1;
-  let rowsPerPage = {daily:15, weekly:15, monthly:9999, custom:15};
-  let totalPages = 1;
-  let currentMonth = "";
-
-  const driverSelect = document.getElementById('driverSelect');
-  const tablesArea = document.getElementById('tablesArea');
-  const dailyBtn = document.getElementById('dailyBtn');
-  const weeklyBtn = document.getElementById('weeklyBtn');
-  const monthlyBtn = document.getElementById('monthlyBtn');
-  const customBtn = document.getElementById('customBtn');
-  const fromDate = document.getElementById('fromDate');
-  const toDate = document.getElementById('toDate');
-  const customRangeArea = document.getElementById('customRangeArea');
-  const monthSelectArea = document.getElementById('monthSelectArea');
-  const monthSelect = document.getElementById('monthSelect');
-  const driverSelectRow = document.getElementById('driverSelectRow');
-
-  // ADMIN/DRIVER LOGIC
-  if (!isAdmin) {
-    driverSelectRow.style.display = "none";
-    selectedDriver = currentUser;
-  }
-
-  db.ref("drivers").on("value", snap => {
-    allDrivers = snap.val() || {};
-    if (isAdmin) {
-      driverSelect.innerHTML = `<option value="">-- Select Driver --</option>`;
-      Object.entries(allDrivers).forEach(([id, d]) => {
-        driverSelect.innerHTML += `<option value="${d.name}">${d.name}</option>`;
-      });
-    }
-    if (!isAdmin) {
-      selectedDriver = currentUser;
-      showReportsTable();
-      updateMonthSelect();
-    }
-  });
-
-  db.ref("logs").on("value", snap => {
-    allLogs = snap.val() || {};
-    if (selectedDriver) showReportsTable();
-    updateMonthSelect();
-  });
-
-  if (isAdmin) {
-    driverSelect.onchange = function() {
-      selectedDriver = driverSelect.value;
-      currentMode = "daily";
-      currentPage = 1;
-      showReportsTable();
-      updateMonthSelect();
-    }
-  }
-
-  dailyBtn.onclick = function(){
-    currentMode="daily";
-    currentPage=1;
-    customRangeArea.style.display='flex';
-    monthSelectArea.style.display='none';
-    showReportsTable();
-  };
-  weeklyBtn.onclick = function(){
-    currentMode="weekly";
-    currentPage=1;
-    customRangeArea.style.display='flex';
-    monthSelectArea.style.display='none';
-    showReportsTable();
-  };
-  monthlyBtn.onclick = function(){
-    currentMode="monthly";
-    currentPage=1;
-    customRangeArea.style.display='none';
-    monthSelectArea.style.display='flex';
-    updateMonthSelect();
-    showReportsTable();
-  };
-  customBtn.onclick = function(){
-    currentMode="custom";
-    currentPage=1;
-    customRangeArea.style.display='flex';
-    monthSelectArea.style.display='none';
-    showReportsTable();
-  };
-
-  monthSelect.onchange = function(){
-    currentMonth = monthSelect.value;
-    showReportsTable();
-  };
-
   function getDriverLogs(name) {
     return Object.entries(allLogs)
       .map(([id, l])=>({...l,id}))
@@ -576,6 +493,7 @@
   }
   function getRows(logs, mode) {
     let rows = [];
+    let selectedDriver = currentUser;
     if(!selectedDriver) return [];
     let today = todayISO();
     let all = getDriverLogs(selectedDriver);
@@ -648,8 +566,8 @@
     }
     return [];
   }
-
   function updateMonthSelect() {
+    let selectedDriver = currentUser;
     if(!selectedDriver) {
       monthSelect.innerHTML = `<option value="">-- Select Month --</option>`;
       return;
@@ -668,17 +586,16 @@
     }).join('');
     if(months.length && (!currentMonth || !months.includes(currentMonth))) currentMonth = months[0];
   }
-
   function getLatestMonthForDriver(driver) {
     let logs = getDriverLogs(driver);
     let months = Array.from(new Set(logs.map(l=>l.date.slice(0,7)))).sort((a,b)=>b.localeCompare(a));
     return months.length ? months[0] : "";
   }
-
   function showReportsTable() {
+    let selectedDriver = currentUser;
     tablesArea.innerHTML = "";
     if(!selectedDriver) {
-      tablesArea.innerHTML = `<div style="color:#93c7e6; text-align:center;margin:1.5em 0 2em 0;font-family:'Poppins',sans-serif;font-weight:600;">Select a driver above to view KM reports.</div>`;
+      tablesArea.innerHTML = `<div style="color:#93c7e6; text-align:center;margin:1.5em 0 2em 0;font-family:'Poppins',sans-serif;font-weight:600;">No report data.</div>`;
       return;
     }
     filteredLogs = getRows(allLogs, currentMode);
@@ -704,7 +621,7 @@
     let tableHTML = `<div class="driver-report-table-wrap"><div class="driver-report-table-title">${titleText}</div>`;
     tableHTML += `<div class="pagination-bar">`;
     if(currentMode!=="monthly" && totalPages>1) {
-      tableHTML += `<button ${currentPage===1?'disabled':''} onclick="nextPage()">Previous</button>`;
+      tableHTML += `<button ${currentPage===1?'disabled':''} onclick="prevPage()">Previous</button>`;
       tableHTML += `<span>${currentPage}/${totalPages}</span>`;
       tableHTML += `<button ${currentPage===totalPages?'disabled':''} onclick="nextPage()">Next</button>`;
     }
@@ -723,15 +640,14 @@
       tableHTML += `<tr><td colspan="6" style="text-align:center;color:#93c7e6;font-size:1.1em;font-weight:700;">No report data.</td></tr>`;
     } else {
       pageRows.forEach(day=>{
-        let dayKm = sumKm(day.logs);
-        day.logs.forEach((row, idx)=>{
+        day.logs.forEach((row)=>{
           tableHTML += `<tr>
             <td>${toDisplayDate(row.date)}</td>
             <td>${row.kmIn}</td>
             <td>${row.kmOut}</td>
             <td>${row.totalKm}</td>
             <td>${row.totalTime || formatTime(row.timer)}</td>
-            <td>${(isAdmin && idx===0)?`<button class="delete-row-btn" title="Delete all reports for this day" onclick="deleteDayRows('${row.date}')"><i class="fas fa-trash"></i></button>`:''}</td>
+            <td><button class="delete-row-btn" title="Delete this report" onclick="deleteReportRow('${row.id}')"><i class="fas fa-trash"></i></button></td>
           </tr>`;
         });
       });
@@ -741,31 +657,60 @@
     const wrap = document.querySelector('.driver-report-table-wrap');
     if(wrap) wrap.scrollLeft = 0;
   }
-
   window.nextPage = function(){
     if(currentPage < totalPages) { currentPage++; showReportsTable(); }
   };
   window.prevPage = function(){
     if(currentPage > 1) { currentPage--; showReportsTable(); }
   };
-  window.deleteDayRows = function(date){
-    if (!isAdmin) return;
-    showConfirmModal("Delete Day Reports", `Are you sure you want to delete <b>ALL</b> reports for <b>${selectedDriver}</b> on <b>${toDisplayDate(date)}</b>? This cannot be undone.`, function(){
-      let logsToDelete = getDriverLogs(selectedDriver).filter(row=>row.date===date);
-      logsToDelete.forEach(row=>{
-        db.ref("logs/"+row.id).remove();
-      });
-      showModal("Deleted", `All reports for <b>${selectedDriver}</b> on <b>${toDisplayDate(date)}</b> deleted.`);
+  window.deleteReportRow = function(logId){
+    showConfirmModal("Delete Report", "Are you sure you want to delete this report entry? This cannot be undone.", function(){
+      db.ref("logs/"+logId).remove();
+      showModal("Deleted", "Report entry deleted.");
       showReportsTable();
       updateMonthSelect();
     });
   };
 
-  window.addEventListener('resize', function(){
-    const wrap = document.querySelector('.driver-report-table-wrap');
-    if(wrap) wrap.scrollLeft = 0;
-  });
+  dailyBtn.onclick = function(){
+    currentMode="daily";
+    currentPage=1;
+    customRangeArea.style.display='flex';
+    monthSelectArea.style.display='none';
+    showReportsTable();
+  };
+  weeklyBtn.onclick = function(){
+    currentMode="weekly";
+    currentPage=1;
+    customRangeArea.style.display='flex';
+    monthSelectArea.style.display='none';
+    showReportsTable();
+  };
+  monthlyBtn.onclick = function(){
+    currentMode="monthly";
+    currentPage=1;
+    customRangeArea.style.display='none';
+    monthSelectArea.style.display='flex';
+    updateMonthSelect();
+    showReportsTable();
+  };
+  customBtn.onclick = function(){
+    currentMode="custom";
+    currentPage=1;
+    customRangeArea.style.display='flex';
+    monthSelectArea.style.display='none';
+    showReportsTable();
+  };
 
+  monthSelect.onchange = function(){
+    currentMonth = monthSelect.value;
+    showReportsTable();
+  };
+  db.ref("logs").on("value", snap => {
+    allLogs = snap.val() || {};
+    showReportsTable();
+    updateMonthSelect();
+  });
   showReportsTable();
 </script>
 </body>
