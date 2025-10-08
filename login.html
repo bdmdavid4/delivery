@@ -236,7 +236,7 @@
       background: #212a40;
     }
     .admin-users-list li:last-child { border-bottom: none;}
-    .admin-user-name, .admin-user-pin {
+    .admin-user-name {
       flex: 1 1 0;
       font-size: 1.09em;
       color: #fff;
@@ -244,6 +244,30 @@
       letter-spacing: 0.02em;
       text-align: center;
     }
+    .admin-user-pin {
+      flex: 1 1 0;
+      font-size: 1.09em;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      position: relative;
+    }
+    .admin-pin-eye {
+      background: none;
+      border: none;
+      color: #bbdefb;
+      font-size: 1.1em;
+      cursor: pointer;
+      margin-left: 6px;
+      padding: 0 2px;
+      transition: color 0.18s;
+    }
+    .admin-pin-eye:hover { color: var(--primary); }
     .admin-users-list button {
       font-size: 1.05em;
       background: none;
@@ -503,6 +527,7 @@
 
   let allUsers = {};
   let isAdmin = false;
+  let pinRevealState = {}; // state for pin reveal/hide
 
   function getUsersFromFirebase() {
     db.ref("users").on("value", snap => {
@@ -599,14 +624,27 @@
     const ul = document.getElementById('adminUsersList');
     ul.innerHTML = '';
     Object.entries(allUsers).forEach(([id, user])=>{
+      const reveal = pinRevealState[id] === true;
+      const pinMasked = "****";
       ul.innerHTML += `<li>
         <span class="admin-user-name">${user.name}</span>
-        <span class="admin-user-pin">${user.pin}</span>
+        <span class="admin-user-pin" id="adminPin_${id}">
+          ${reveal ? user.pin : pinMasked}
+          <button class="admin-pin-eye" title="${reveal ? "Hide" : "Show"} PIN" onclick="togglePinReveal('${id}')">
+            <i class="fa${reveal ? 's' : 'r'} fa-eye${reveal ? '-slash' : ''}"></i>
+          </button>
+        </span>
         <button class="edit-btn" title="Edit" onclick="editUser('${id}','${user.name}','${user.pin}')"><i class="fas fa-edit"></i></button>
         <button class="delete-btn" title="Delete" onclick="deleteUser('${id}')"><i class="fas fa-trash"></i></button>
       </li>`;
     });
   }
+
+  window.togglePinReveal = function(id) {
+    pinRevealState[id] = !pinRevealState[id];
+    renderAdminUsersList();
+  };
+
   window.editUser = function(id,name,pin){
     showEditModal(id,name,pin);
   }
