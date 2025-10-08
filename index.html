@@ -457,9 +457,7 @@
       const driverBoard = document.getElementById('driverBoard');
       driverBoard.innerHTML = "";
       Object.entries(allUsers).forEach(([userId, userObj]) => {
-        // --- ALLOW ALL DRIVERS TO SEE AND USE ONLY THEIR OWN CARD ---
-        if (!isAdmin && userObj.name !== currentUser) return;
-        // -----------------------------------------------------------
+        // REMOVED: if (!isAdmin && userObj.name !== currentUser) return;
         if (!driverState[userId]) driverState[userId] = {
           kmIn: "",
           kmOut: "",
