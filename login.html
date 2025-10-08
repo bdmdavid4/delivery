@@ -362,6 +362,11 @@
   </style>
 </head>
 <body>
+  <div class="header-btnbar">
+  <button class="reports-btn" id="showReportsBtn"><i class="fas fa-road"></i> Show KM Reports</button>
+  <button class="reports-btn" id="showAllReportsBtn" style="display:none;"><i class="fas fa-list-alt"></i> Show All Reports</button>
+  <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+</div>
 <div class="page-wrapper">
   <div class="header">
     <span class="header-title"><i class="fas fa-user"></i> Delivery Drivers Login</span>
@@ -633,6 +638,16 @@
       localStorage.removeItem('user');
       window.location.href="login.html";
     });
+  };
+   // After your userData is loaded and checked:
+  if (userData && userData.role === "admin") {
+    document.getElementById('showAllReportsBtn').style.display = '';
+  }
+  document.getElementById("showAllReportsBtn").onclick = function() {
+    window.location.href = "reports.html?admin=1";
+  };
+  document.getElementById("showReportsBtn").onclick = function() {
+    window.location.href = "reports.html";
   };
 </script>
 </body>
