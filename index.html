@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
   <style>
-   :root {
+    :root {
       --main-bg: linear-gradient(135deg, #0d47a1 0%, #000 100%);
       --card-bg: #181c24;
       --primary: #42a5f5;
@@ -302,8 +302,6 @@
     .modal-confirm-btn { background: var(--red); color: #fff; border: none; border-radius: 10px; font-size: 1.01em; font-weight: 700; padding: 7px 22px; cursor: pointer; transition: background 0.18s; font-family: inherit; box-shadow: 0 2px 8px #ff3b3033; letter-spacing: 0.03em;}
     .modal-confirm-btn:hover { background: #c11;}
     .modal-cancel-btn { background: var(--border); color: #bbdefb; border: none; border-radius: 10px; font-size: 1.01em; font-weight: 700; padding: 7px 22px; cursor: pointer; transition: background 0.18s; font-family: inherit; box-shadow: 0 2px 8px #212a4033; letter-spacing: 0.03em;}
-    /* (CSS is unchanged from your original, see above for details) */
-    /* ... all your previous CSS ... */
   </style>
 </head>
 <body>
@@ -322,7 +320,6 @@
         <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
       </div>
     </div>
-    <!-- Removed add driver bar -->
     <div class="log-board" id="driverBoard"></div>
     <div class="how-to-use" id="howToUse">
       <b>How to use:</b><br>
@@ -460,7 +457,9 @@
       const driverBoard = document.getElementById('driverBoard');
       driverBoard.innerHTML = "";
       Object.entries(allUsers).forEach(([userId, userObj]) => {
-        if (!isAdmin && userObj.name !== currentUser) return; // Only own card for driver
+        // --- ALLOW ALL DRIVERS TO SEE AND USE ONLY THEIR OWN CARD ---
+        if (!isAdmin && userObj.name !== currentUser) return;
+        // -----------------------------------------------------------
         if (!driverState[userId]) driverState[userId] = {
           kmIn: "",
           kmOut: "",
@@ -483,7 +482,6 @@
         dateEl.className = 'driver-date';
         dateEl.value = s.date;
         dateEl.maxLength = 10;
-        // FIX: Only disable dateEl when shift is running *and* field is not focused, so it can be selected.
         dateEl.disabled = s.running;
         dateEl.onfocus = function() {
           dateEl.disabled = false;
@@ -541,7 +539,6 @@
         kmIn.type = 'number';
         kmIn.placeholder = 'Start';
         kmIn.value = s.kmIn;
-        // FIX: Do not block pointer events for number inputs
         kmIn.disabled = s.running;
         kmIn.onfocus = function() {
           kmIn.disabled = false;
@@ -577,7 +574,6 @@
         kmOut.type = 'number';
         kmOut.placeholder = 'End';
         kmOut.value = s.kmOut;
-        // FIX: Do not block pointer events for number inputs
         kmOut.disabled = !s.running;
         kmOut.onfocus = function() {
           kmOut.disabled = false;
