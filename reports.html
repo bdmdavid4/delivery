@@ -398,17 +398,14 @@
     </div>
   </div>
 </div>
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
-  // ---- USER CONTEXT CHECK ----
   const userData = JSON.parse(localStorage.getItem("user") || "null");
   if (!userData) { window.location.href = "login.html"; }
   const isAdmin = userData.role === "admin";
   const currentUser = userData.name;
 
-  // Helpers
   function pad2(n){return String(n).padStart(2,'0');}
   function formatTime(sec) {
     if (!sec) sec = 0;
@@ -432,7 +429,6 @@
     return dt.toISOString().slice(0,10);
   }
 
-  // Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyCirYQ_46JiSkMIwCNs1nSi89dvB1MUg_A",
     authDomain: "deliverylog12.firebaseapp.com",
@@ -446,7 +442,6 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  // Modals
   function showModal(title, details) {
     document.getElementById('modalTitle').innerHTML = title;
     document.getElementById('modalDetails').innerHTML = details;
@@ -458,7 +453,6 @@
   document.getElementById('modalDone').onclick = hideModal;
   document.getElementById('modalBg').onclick = function(e){ if(e.target===document.getElementById('modalBg')) hideModal(); };
 
-  // Confirm delete modal
   let pendingDelete = null;
   function showConfirmModal(title, details, onConfirm) {
     document.getElementById('confirmModalTitle').innerHTML = title;
@@ -476,7 +470,6 @@
 
   document.getElementById('backHomeBtn').onclick = () => { window.location.href = "index.html"; };
 
-  // Global data
   let allDrivers = {};
   let allLogs = {};
   let selectedDriver = "";
@@ -487,7 +480,6 @@
   let totalPages = 1;
   let currentMonth = "";
 
-  // DOM
   const driverSelect = document.getElementById('driverSelect');
   const tablesArea = document.getElementById('tablesArea');
   const dailyBtn = document.getElementById('dailyBtn');
@@ -503,7 +495,6 @@
 
   // ADMIN/DRIVER LOGIC
   if (!isAdmin) {
-    // Hide driver select, always use current user
     driverSelectRow.style.display = "none";
     selectedDriver = currentUser;
   }
@@ -659,7 +650,6 @@
   }
 
   function updateMonthSelect() {
-    // Populate months for selected driver
     if(!selectedDriver) {
       monthSelect.innerHTML = `<option value="">-- Select Month --</option>`;
       return;
@@ -714,7 +704,7 @@
     let tableHTML = `<div class="driver-report-table-wrap"><div class="driver-report-table-title">${titleText}</div>`;
     tableHTML += `<div class="pagination-bar">`;
     if(currentMode!=="monthly" && totalPages>1) {
-      tableHTML += `<button ${currentPage===1?'disabled':''} onclick="prevPage()">Previous</button>`;
+      tableHTML += `<button ${currentPage===1?'disabled':''} onclick="nextPage()">Previous</button>`;
       tableHTML += `<span>${currentPage}/${totalPages}</span>`;
       tableHTML += `<button ${currentPage===totalPages?'disabled':''} onclick="nextPage()">Next</button>`;
     }
@@ -759,7 +749,7 @@
     if(currentPage > 1) { currentPage--; showReportsTable(); }
   };
   window.deleteDayRows = function(date){
-    if (!isAdmin) return; // Only admin can delete
+    if (!isAdmin) return;
     showConfirmModal("Delete Day Reports", `Are you sure you want to delete <b>ALL</b> reports for <b>${selectedDriver}</b> on <b>${toDisplayDate(date)}</b>? This cannot be undone.`, function(){
       let logsToDelete = getDriverLogs(selectedDriver).filter(row=>row.date===date);
       logsToDelete.forEach(row=>{
