@@ -730,3 +730,24 @@
         const timerDisplay = card.querySelector('.driver-timer');
         if (btns.length === 2) {
           btns[0].disabled
+        = s.running || !s.kmIn || !s.date || s.kmIn.length < 1 || s.kmIn.length > 9;
+          btns[1].disabled = !s.running || !s.kmOut || s.kmOut.length < 1 || s.kmOut.length > 9;
+        }
+        if (kmIn) kmIn.disabled = s.running;
+        if (kmOut) kmOut.disabled = !s.running;
+        const kmResult = card.querySelector('.driver-km-result');
+        if(kmResult) {
+          if(s.kmIn && s.kmOut && !isNaN(+s.kmIn) && !isNaN(+s.kmOut) && +s.kmOut >= +s.kmIn && s.kmIn.length >= 1 && s.kmIn.length <= 9 && s.kmOut.length >= 1 && s.kmOut.length <= 9) {
+            kmResult.innerHTML = `<i class="fas fa-road"></i> Today: <span style="font-weight:900;color:var(--primary)">` + (+s.kmOut - +s.kmIn) + ` km</span>`;
+          } else { kmResult.textContent = ''; }
+        }
+        if (timerDisplay) {
+          timerDisplay.textContent = formatTime(s.stopped ? 0 : (s.timer || 0));
+        }
+        if (s.running) card.classList.add('active');
+        else card.classList.remove('active');
+      });
+    }, 350);
+  </script>
+</body>
+</html>
