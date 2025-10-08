@@ -320,6 +320,25 @@
       margin-top: 5px;
       width: 90%;
     }
+    .admin-show-reports-btn {
+      background: var(--primary-hover);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.07em;
+      font-weight: 700;
+      padding: 10px 0;
+      cursor: pointer;
+      transition: background 0.18s;
+      margin-top: 5px;
+      margin-bottom: 8px;
+      font-family: inherit;
+      box-shadow: 0 2px 8px #42a5f533;
+      letter-spacing: 0.03em;
+    }
+    .admin-show-reports-btn:hover {
+      background: #333;
+    }
 @media (max-width: 600px) {
   html, body { font-size: 15px; }
   .login-card, .admin-panel {
@@ -394,6 +413,7 @@
       <button class="add-btn" id="addUserBtn"><i class="fas fa-plus"></i> Add</button>
     </div>
     <ul class="admin-users-list" id="adminUsersList"></ul>
+    <button class="admin-show-reports-btn" id="adminShowReportsBtn"><i class="fas fa-list-alt"></i> Show All Reports</button>
     <button class="admin-logout-btn" id="adminLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
   </div>
   <!-- Modals -->
@@ -633,6 +653,11 @@
       localStorage.removeItem('user');
       window.location.href="login.html";
     });
+  };
+
+  // Show All Reports Button Handler
+  document.getElementById('adminShowReportsBtn').onclick = function(){
+    window.location.href = "allreports.html";
   };
 </script>
 </body>
