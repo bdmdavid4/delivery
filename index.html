@@ -67,7 +67,7 @@
       box-shadow: 0 2px 9px rgba(66, 165, 245, 0.08);
       min-height: 43px;
       letter-spacing: 0.03em;
-      max-width: 1100px;
+      max-width: 600px;
       align-self: center;
     }
     .header-row {
@@ -229,29 +229,6 @@
     .driver-btns .stop-btn:active { background: #ff3b30;}
     .driver-btns .disabled, .driver-btns button:disabled { opacity: 0.5; pointer-events: none;}
     .how-to-use { width: 100vw; max-width: 1050px; margin: 18px auto 0 auto; padding: 13px 14px 11px 14px; background: #161a23cc; border-radius: 10px; color: #bbdefb; font-size: 0.97em; font-family: 'Poppins', Arial, sans-serif; text-align: left; line-height: 1.6; letter-spacing: 0.01em; box-shadow: 0 2px 8px #212a4033; box-sizing: border-box; overflow-x: hidden; align-self: center;}
-    @media (max-width: 1100px) { .log-board { max-width: 99vw; } .driver-card { min-width: 0; max-width: 99vw; } }
-    @media (max-width: 900px) { .log-board { grid-template-columns: 1fr; padding: 0 8px; gap: 16px; } .driver-card { min-width: 98vw; max-width: 98vw; font-size: 0.97em; } }
-    @media (max-width: 600px) {
-      html, body { font-size: 15px; }
-      .log-board { grid-template-columns: 1fr; padding: 0 2px; gap:16px;}
-      .driver-card { min-width: 99vw; max-width: 99vw; font-size: 0.96em;}
-      .driver-card-header .driver-date { width: 130px; min-width: 120px; max-width: 140px; font-size: 1.05em; }
-    }
-    @media (max-width: 450px) {
-      html, body { font-size: 14px; }
-      .driver-card-header, .driver-fields-row, .driver-btns, .driver-km-result, .driver-timer-bar {padding-left:4px;padding-right:4px;}
-      .driver-card { font-size: 0.93em;}
-    }
-    .modal-bg { display: none; position: fixed; z-index: 500; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(13, 32, 70, 0.82); align-items: center; justify-content: center;}
-    .modal-bg.active { display: flex;}
-    .modal-content { background: var(--card-bg); color: var(--accent); border-radius: 18px; border: 2px solid var(--primary); box-shadow: 0 7px 32px #42a5f547; padding: 28px 30px 22px 30px; display: flex; flex-direction: column; align-items: center; min-width: 270px; max-width: 95vw; min-height: 135px; font-family: 'Poppins', Arial, sans-serif; animation: pop .18s cubic-bezier(.45,1.4,.68,1.02); position: relative;}
-    .modal-title { font-size: 1.12em; font-weight: 700; color: #fff; margin-bottom: 9px; text-align: center; letter-spacing: 0.02em;}
-    .modal-details { margin-bottom: 16px; color: var(--accent); font-size: 1em; font-weight: 500; text-align: center; word-break: break-word;}
-    .modal-done-btn { background: var(--primary); color: #fff; border: none; border-radius: 10px; font-size: 1.01em; font-weight: 700; padding: 10px 34px; cursor: pointer; transition: background 0.18s; margin-top: 2px; font-family: inherit; box-shadow: 0 2px 8px #42a5f533; letter-spacing: 0.03em;}
-    .modal-done-btn:hover { background: var(--primary-hover);}
-    .modal-close { position: absolute; top: 11px; right: 16px; background: none; border: none; color: #bbdefb; font-size: 1.22em; cursor: pointer; padding: 0; border-radius: 50%; transition: background 0.12s;}
-    .modal-close:active { background: #212a40;}
-    @keyframes pop { from { transform: scale(0.91); opacity: 0.3;} to   { transform: scale(1);    opacity: 1;} }
   </style>
 </head>
 <body>
@@ -298,16 +275,12 @@
       </div>
     </div>
   </div>
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script>
-    // --- Auth ---
     const userData = JSON.parse(localStorage.getItem("user") || "null");
     if (!userData) { window.location.href = "login.html"; }
     const currentUser = userData.name;
-
-    // --- Firebase ---
     const firebaseConfig = {
       apiKey: "AIzaSyCirYQ_46JiSkMIwCNs1nSi89dvB1MUg_A",
       authDomain: "deliverylog12.firebaseapp.com",
@@ -320,11 +293,8 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
     let allUsers = {};
     let driverState = {};
-
-    // --- MODAL LOGIC ---
     function showModal(details) {
       document.getElementById('modalDetails').innerHTML = details;
       document.getElementById('modalBg').classList.add('active');
@@ -339,13 +309,10 @@
     document.getElementById("cancelLogoutBtn").onclick = () => { document.getElementById("logoutModalBg").classList.remove('active'); };
     document.getElementById("logoutModalBg").onclick = function(e) { if (e.target === document.getElementById("logoutModalBg")) document.getElementById("logoutModalBg").classList.remove('active'); };
     document.getElementById("confirmLogoutBtn").onclick = function() { localStorage.removeItem('user'); window.location.href = "login.html"; };
-
-    // --- DATA LOADING ---
     db.ref("users").on("value", snap => {
       allUsers = snap.val() || {};
       renderDrivers();
     });
-
     db.ref("driverStates").on("value", snap => {
       const states = snap.val() || {};
       Object.entries(states).forEach(([userId, state]) => {
@@ -354,11 +321,9 @@
       });
       renderDrivers();
     });
-
     function updateDriverState(userId) {
       db.ref("driverStates/" + userId).set(driverState[userId]);
     }
-
     function pad2(n){return String(n).padStart(2,'0');}
     function formatTime(sec) {
       const h = String(Math.floor(sec/3600)).padStart(2,'0');
@@ -373,12 +338,9 @@
       const mIndex = parseInt(m,10)-1;
       return `${pad2(d)}/${months[mIndex]}/${y}`;
     }
-
-    // --- CORE RENDER ---
     function renderDrivers() {
       const driverBoard = document.getElementById('driverBoard');
       driverBoard.innerHTML = "";
-      // Only show the card for the logged-in driver
       let userId = null;
       Object.entries(allUsers).forEach(([id, userObj]) => {
         if (userObj.name === currentUser) userId = id;
@@ -426,7 +388,6 @@
       headerRow.appendChild(nameEl);
       headerRow.appendChild(dateEl);
       card.appendChild(headerRow);
-
       const fieldsRow = document.createElement('div');
       fieldsRow.className = 'driver-fields-row';
       const kmInLbl = document.createElement('label');
@@ -455,7 +416,6 @@
       kmInWrap.appendChild(kmInUnit);
       fieldsRow.appendChild(kmInLbl);
       fieldsRow.appendChild(kmInWrap);
-
       const kmOutLbl = document.createElement('label');
       kmOutLbl.textContent = "Out";
       const kmOutWrap = document.createElement('span');
@@ -483,14 +443,12 @@
       fieldsRow.appendChild(kmOutLbl);
       fieldsRow.appendChild(kmOutWrap);
       card.appendChild(fieldsRow);
-
       const kmResult = document.createElement('div');
       kmResult.className = 'driver-km-result';
       if(s.kmIn && s.kmOut && !isNaN(+s.kmIn) && !isNaN(+s.kmOut) && +s.kmOut >= +s.kmIn) {
         kmResult.innerHTML = `<i class="fas fa-road"></i> Today: <span style="font-weight:900;color:var(--primary)">` + (+s.kmOut - +s.kmIn) + ` km</span>`;
       } else { kmResult.textContent = ''; }
       card.appendChild(kmResult);
-
       // TIMER BAR
       const timerBar = document.createElement('div');
       timerBar.className = 'driver-timer-bar';
@@ -499,7 +457,6 @@
       timerDisplay.textContent = formatTime(s.timer);
       timerBar.appendChild(timerDisplay);
       card.appendChild(timerBar);
-
       const btns = document.createElement('div');
       btns.className = 'driver-btns';
       const startBtn = document.createElement('button');
@@ -524,7 +481,6 @@
         }, 1000);
       };
       btns.appendChild(startBtn);
-
       const stopBtn = document.createElement('button');
       stopBtn.innerHTML = `<i class="fas fa-stop"></i> Stop`;
       stopBtn.className = "stop-btn";
@@ -570,9 +526,7 @@
       };
       btns.appendChild(stopBtn);
       card.appendChild(btns);
-
       driverBoard.appendChild(card);
-
       // Timer
       if (s.running && s.startTime && !s.stopped) {
         if (!s.timerInterval) {
@@ -591,7 +545,6 @@
         timerDisplay.textContent = formatTime(s.timer || 0);
       }
     }
-
     setInterval(() => { renderDrivers(); }, 350);
   </script>
 </body>
