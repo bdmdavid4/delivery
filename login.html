@@ -396,11 +396,36 @@
     <ul class="admin-users-list" id="adminUsersList"></ul>
     <button class="admin-logout-btn" id="adminLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
   </div>
-  <!-- Modals ... -->
-  <div class="modal-bg" id="modalBg"><div class="modal-content" id="modalContent"><button class="modal-close" id="modalClose" title="Close">&times;</button><div class="modal-title" id="modalTitle"></div><div class="modal-details" id="modalDetails"></div><button class="modal-done-btn" id="modalDone">Done</button></div></div>
-  <div class="modal-bg" id="confirmModalBg"><div class="modal-confirm" id="confirmModalContent"><div class="modal-confirm-title" id="confirmModalTitle"></div><div class="modal-confirm-details" id="confirmModalDetails"></div><div class="modal-confirm-btns"><button class="modal-confirm-btn" id="confirmDeleteBtn">Delete</button><button class="modal-cancel-btn" id="cancelDeleteBtn">Cancel</button></div></div></div>
-  <div class="modal-bg" id="editModalBg"><div class="edit-user-modal" id="editUserModal"><button class="modal-close" id="editModalClose" title="Close">&times;</button><div class="modal-title" id="editUserModalTitle">Edit User</div><input type="text" id="editUserName" maxlength="20"/><input type="password" id="editUserPin" maxlength="4" pattern="[0-9]{4}"/><button class="modal-done-btn" id="editUserSaveBtn">Save</button></div></div>
+  <!-- Modals -->
+  <div class="modal-bg" id="modalBg">
+    <div class="modal-content" id="modalContent">
+      <button class="modal-close" id="modalClose" title="Close">&times;</button>
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-details" id="modalDetails"></div>
+      <button class="modal-done-btn" id="modalDone">Done</button>
+    </div>
+  </div>
+  <div class="modal-bg" id="confirmModalBg">
+    <div class="modal-confirm" id="confirmModalContent">
+      <div class="modal-confirm-title" id="confirmModalTitle"></div>
+      <div class="modal-confirm-details" id="confirmModalDetails"></div>
+      <div class="modal-confirm-btns">
+        <button class="modal-confirm-btn" id="confirmDeleteBtn">Delete</button>
+        <button class="modal-cancel-btn" id="cancelDeleteBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-bg" id="editModalBg">
+    <div class="edit-user-modal" id="editUserModal">
+      <button class="modal-close" id="editModalClose" title="Close">&times;</button>
+      <div class="modal-title" id="editUserModalTitle">Edit User</div>
+      <input type="text" id="editUserName" maxlength="20"/>
+      <input type="password" id="editUserPin" maxlength="4" pattern="[0-9]{4}"/>
+      <button class="modal-done-btn" id="editUserSaveBtn">Save</button>
+    </div>
+  </div>
 </div>
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
