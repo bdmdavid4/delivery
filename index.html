@@ -17,6 +17,9 @@
       --red: #ff3b30;
       --gap: 24px;
       --card-radius: 15px;
+      --mobile-marked-bg: #183350;
+      --mobile-marked-border: #42a5f5;
+      --mobile-marked-color: #7ec5fd;
     }
     html, body {
       min-height: 100vh;
@@ -278,6 +281,14 @@
       border: 2.2px solid var(--primary);
       background: #183350;
       color: #7ec5fd;
+    }
+    @media (max-width: 600px) {
+      .input-km-wrap input[type="number"].field-marked,
+      .input-km-wrap input[type="time"].field-marked {
+        border: 2.2px solid var(--mobile-marked-border);
+        background: var(--mobile-marked-bg);
+        color: var(--mobile-marked-color);
+      }
     }
     .driver-km-result {
       margin: 6px 0 4px 0;
@@ -569,12 +580,12 @@
 
         // In KM
         const kmInLbl = document.createElement('label');
-        kmInLbl.textContent = "Enter KM In";
+        kmInLbl.textContent = "Enter kilometers In";
         const kmInWrap = document.createElement('span');
         kmInWrap.className = 'input-km-wrap';
         const kmIn = document.createElement('input');
         kmIn.type = 'number';
-        kmIn.placeholder = 'Enter start km';
+        kmIn.placeholder = 'Enter start kilometers';
         kmIn.value = s.kmIn;
         kmIn.disabled = s.running;
         kmIn.className = s.running ? 'field-marked' : '';
@@ -615,12 +626,12 @@
 
         // Out KM
         const kmOutLbl = document.createElement('label');
-        kmOutLbl.textContent = "Enter KM Out";
+        kmOutLbl.textContent = "Enter kilometers Out";
         const kmOutWrap = document.createElement('span');
         kmOutWrap.className = 'input-km-wrap';
         const kmOut = document.createElement('input');
         kmOut.type = 'number';
-        kmOut.placeholder = 'Enter end km';
+        kmOut.placeholder = 'Enter end kilometers';
         kmOut.value = s.kmOut;
         kmOut.disabled = !s.running;
         kmOut.className = (!s.running && s.kmOut) ? 'field-marked' : '';
@@ -715,7 +726,7 @@
         stopBtn.disabled = !s.running || !s.kmOut || !s.outTime || s.kmOut.length < 1 || s.kmOut.length > 9;
         stopBtn.onclick = () => {
           if (!s.kmOut || Number(s.kmOut) < Number(s.kmIn)) {
-            alert("Enter valid ending km (greater than or equal to start)");
+            alert("Enter valid ending kilometers (greater than or equal to start)");
             return;
           }
           if (!s.outTime) {
