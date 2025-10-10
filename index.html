@@ -219,8 +219,8 @@
     .driver-fields-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-row-gap: 3px;
-      grid-column-gap: 4px;
+      grid-row-gap: 5px;
+      grid-column-gap: 8px;
       padding: 7px 7px 3px 7px;
       margin: 0;
       justify-items: stretch;
@@ -252,13 +252,37 @@
       min-width: 0;
       width: auto;
     }
-    .input-km-wrap input[type="number"], .input-km-wrap input[type="time"] {
-      width: 4.4em;
+    .input-km-wrap input[type="number"] {
+      width: 10em;
+      max-width: 100%;
+      font-size: 1em;
+      padding: 0.34em 0.11em 0.34em 0.32em;
+      background: #212a40;
+      border: 1px solid #384164;
+      border-radius: 6px;
+      color: #fff;
+      outline: none;
+      text-align: left;
+      font-family: inherit;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: none;
+      min-width: 0;
+      margin-right: 0.06em;
+      transition: border 0.2s;
+    }
+    .input-km-wrap input[type="number"].field-marked {
+      border: 2px solid var(--primary);
+      background: #183350;
+      color: #7ec5fd;
+    }
+    .input-km-wrap input[type="time"] {
+      width: 5em;
       font-size: 0.92em;
       padding: 0.34em 0.11em 0.34em 0.32em;
       background: #212a40;
       border: 1px solid #384164;
-      border-radius: 6px 0 0 6px;
+      border-radius: 6px;
       color: #fff;
       outline: none;
       text-align: center;
@@ -268,19 +292,6 @@
       box-shadow: none;
       min-width: 0;
       margin-right: 0.06em;
-    }
-    .input-km-wrap .km-unit {
-      font-size: 0.89em;
-      color: #7ec5fd;
-      margin-left: 0.13em;
-      margin-right: 0.13em;
-      font-weight: 600;
-      white-space: nowrap;
-      background: transparent;
-      border: none;
-      padding: 0;
-      pointer-events: none;
-      user-select: none;
     }
     .driver-km-result {
       margin: 2px 0 2px 0;
@@ -336,12 +347,14 @@
       .log-board { grid-template-columns: 1fr; padding: 0 2px; gap:16px;}
       .driver-card { min-width: 99vw; max-width: 99vw; font-size: 0.93em;}
       .driver-card-header .driver-date { width: 110px; min-width: 90px; max-width: 120px; font-size: 0.98em; }
+      .input-km-wrap input[type="number"] { width: 7em; }
     }
     @media (max-width: 450px) {
       html, body { font-size: 13px; }
       .driver-card-header, .driver-fields-row, .driver-btns, .driver-km-result {padding-left:2px;padding-right:2px;}
       .driver-card { font-size: 0.92em;}
-      .input-km-wrap input[type="number"], .input-km-wrap input[type="time"] { width: 4em; font-size: 0.92em;}
+      .input-km-wrap input[type="number"] { width: 6em; }
+      .input-km-wrap input[type="time"] { width: 3.7em;}
     }
     .modal-bg { display: none; position: fixed; z-index: 500; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(13, 32, 70, 0.82); align-items: center; justify-content: center;}
     .modal-bg.active { display: flex;}
@@ -570,14 +583,15 @@
 
         // In KM
         const kmInLbl = document.createElement('label');
-        kmInLbl.textContent = "In";
+        kmInLbl.textContent = "Enter KM In";
         const kmInWrap = document.createElement('span');
         kmInWrap.className = 'input-km-wrap';
         const kmIn = document.createElement('input');
         kmIn.type = 'number';
-        kmIn.placeholder = 'Start';
+        kmIn.placeholder = 'Enter start km';
         kmIn.value = s.kmIn;
         kmIn.disabled = s.running;
+        kmIn.className = s.running ? 'field-marked' : '';
         kmIn.onblur = function(e) {
           if (e.target.value.length < 1 || e.target.value.length > 9) return;
           s.kmIn = e.target.value;
@@ -592,11 +606,7 @@
             kmIn.blur();
           }
         };
-        const kmInUnit = document.createElement('span');
-        kmInUnit.className = 'km-unit';
-        kmInUnit.textContent = "Km";
         kmInWrap.appendChild(kmIn);
-        kmInWrap.appendChild(kmInUnit);
 
         // In Time
         const inTimeLbl = document.createElement('label');
@@ -619,14 +629,15 @@
 
         // Out KM
         const kmOutLbl = document.createElement('label');
-        kmOutLbl.textContent = "Out";
+        kmOutLbl.textContent = "Enter KM Out";
         const kmOutWrap = document.createElement('span');
         kmOutWrap.className = 'input-km-wrap';
         const kmOut = document.createElement('input');
         kmOut.type = 'number';
-        kmOut.placeholder = 'End';
+        kmOut.placeholder = 'Enter end km';
         kmOut.value = s.kmOut;
         kmOut.disabled = !s.running;
+        kmOut.className = !s.running && s.kmOut ? 'field-marked' : '';
         kmOut.onblur = function(e) {
           if (e.target.value.length < 1 || e.target.value.length > 9) return;
           s.kmOut = e.target.value;
@@ -641,11 +652,7 @@
             kmOut.blur();
           }
         };
-        const kmOutUnit = document.createElement('span');
-        kmOutUnit.className = 'km-unit';
-        kmOutUnit.textContent = "Km";
         kmOutWrap.appendChild(kmOut);
-        kmOutWrap.appendChild(kmOutUnit);
 
         // Out Time
         const outTimeLbl = document.createElement('label');
@@ -707,6 +714,7 @@
           startBtn.disabled = true;
           stopBtn.disabled = false;
           kmIn.disabled = true;
+          kmIn.className = 'field-marked';
           inTime.disabled = true;
           kmOut.disabled = false;
           outTime.disabled = false;
@@ -772,9 +780,15 @@
           btns[0].disabled = s.running || !s.kmIn || !s.date || !s.inTime || s.kmIn.length < 1 || s.kmIn.length > 9;
           btns[1].disabled = !s.running || !s.kmOut || !s.outTime || s.kmOut.length < 1 || s.kmOut.length > 9;
         }
-        if (kmIn) kmIn.disabled = s.running;
+        if (kmIn) {
+          kmIn.disabled = s.running;
+          kmIn.className = s.running ? 'field-marked' : '';
+        }
         if (inTime) inTime.disabled = s.running;
-        if (kmOut) kmOut.disabled = !s.running;
+        if (kmOut) {
+          kmOut.disabled = !s.running;
+          kmOut.className = !s.running && s.kmOut ? 'field-marked' : '';
+        }
         if (outTime) outTime.disabled = !s.running;
         const kmResult = card.querySelector('.driver-km-result');
         if(kmResult) {
