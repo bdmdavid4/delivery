@@ -276,6 +276,10 @@
       transition: border 0.18s;
       letter-spacing: 0.01em;
     }
+    .input-km-wrap input[type="number"]:not([disabled])::-webkit-input-placeholder {
+      color: #bbdefb;
+      opacity: 1;
+    }
     .input-km-wrap input[type="number"].field-marked,
     .input-km-wrap input[type="time"].field-marked {
       border: 2.2px solid var(--primary);
@@ -589,6 +593,8 @@
         kmIn.value = s.kmIn;
         kmIn.disabled = s.running;
         kmIn.className = s.running ? 'field-marked' : '';
+        kmIn.min = "1";
+        kmIn.max = "999999999";
         kmIn.onblur = function(e) {
           if (e.target.value.length < 1 || e.target.value.length > 9) return;
           s.kmIn = e.target.value;
@@ -635,6 +641,8 @@
         kmOut.value = s.kmOut;
         kmOut.disabled = !s.running;
         kmOut.className = (!s.running && s.kmOut) ? 'field-marked' : '';
+        kmOut.min = "1";
+        kmOut.max = "999999999";
         kmOut.onblur = function(e) {
           if (e.target.value.length < 1 || e.target.value.length > 9) return;
           s.kmOut = e.target.value;
