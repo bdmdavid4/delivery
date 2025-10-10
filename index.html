@@ -272,11 +272,9 @@
     .driver-fields-row { display: flex; align-items: center; gap: 0.7em; margin: 13px 0 3px 0; padding: 0 15px; justify-content: stretch;}
     .driver-fields-row label { font-size: 1em; font-weight: 600; color: #bbdefb; margin-right: 0; padding-right: 0; font-family: inherit; white-space: nowrap;}
     .input-km-wrap { display: inline-flex; align-items: center; border-radius: 7px; background: #212a40; box-shadow: 0 1px 4px #009de018; margin: 0 0.15em; padding-left: 0.15em; padding-right: 0.2em;}
-    .input-km-wrap input[type="number"] { width: 9em; font-size: 1.07em; padding: 0.42em 0.12em 0.42em 0.55em; background: #212a40; border: 1px solid #384164; border-radius: 7px 0 0 7px; color: #fff; outline: none; text-align: center; font-family: inherit; font-weight: 700; white-space: nowrap; box-shadow: none;}
+    .input-km-wrap input[type="number"], .input-km-wrap input[type="time"] { width: 5.5em; font-size: 1.07em; padding: 0.42em 0.12em 0.42em 0.55em; background: #212a40; border: 1px solid #384164; border-radius: 7px 0 0 7px; color: #fff; outline: none; text-align: center; font-family: inherit; font-weight: 700; white-space: nowrap; box-shadow: none;}
     .input-km-wrap .km-unit { font-size: 0.98em; color: #7ec5fd; margin-left: 0.2em; margin-right: 0.3em; font-weight: 700; white-space: nowrap; background: transparent; border: none; padding: 0; pointer-events: none; user-select: none;}
     .driver-km-result { margin: 0 0 2px 0; font-size: 1.08em; font-weight: 700; color: var(--primary); font-family: inherit; letter-spacing: 0.04em; text-align: left; padding: 0 15px; min-height: 21px; display: flex; align-items: center; gap: 0.4em;}
-    .driver-timer-bar { display: flex; align-items: center; gap: 0.6em; margin: 0 0 2px 0; min-height: 1.4em; padding: 0 15px;}
-    .driver-timer { font-size: 1.08em; font-weight: 800; color: #ffc107; background: #212a40; border-radius: 7px; padding: 2px 14px; min-width: 4.6em; text-align: center; letter-spacing: 0.025em; font-family: inherit; border: 1.1px solid #009de055; box-shadow: 0 1px 7px #009de022;}
     .driver-btns { display: flex; gap: 0.7em; margin-top: 8px; padding: 0 15px 15px 15px;}
     .driver-btns button { flex: 1 1 0; font-size: 1.03em; font-weight: 700; border: none; border-radius: 9px; padding: 0.65em 0; background: linear-gradient(90deg,var(--primary),var(--primary-hover)); color: #fff; box-shadow: 0 1px 4px rgba(66,165,245,0.09); cursor: pointer; letter-spacing: 0.04em; transition: background 0.13s; min-width: 0; font-family: inherit;}
     .driver-btns button:active { background: var(--primary-hover);}
@@ -291,31 +289,14 @@
       .log-board { grid-template-columns: 1fr; padding: 0 2px; gap:16px;}
       .driver-card { min-width: 99vw; max-width: 99vw; font-size: 0.96em;}
       .driver-card-header .driver-date { width: 130px; min-width: 120px; max-width: 140px; font-size: 1.05em; }
-      .input-km-wrap input[type="number"] { width: 7em;}
+      .input-km-wrap input[type="number"], .input-km-wrap input[type="time"] { width: 7em;}
     }
     @media (max-width: 450px) {
       html, body { font-size: 14px; }
-      .driver-card-header, .driver-fields-row, .driver-btns, .driver-km-result, .driver-timer-bar {padding-left:4px;padding-right:4px;}
+      .driver-card-header, .driver-fields-row, .driver-btns, .driver-km-result {padding-left:4px;padding-right:4px;}
       .driver-card { font-size: 0.93em;}
-      .input-km-wrap input[type="number"] { width: 6em;}
+      .input-km-wrap input[type="number"], .input-km-wrap input[type="time"] { width: 6em;}
     }
-    .modal-bg { display: none; position: fixed; z-index: 500; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(13, 32, 70, 0.82); align-items: center; justify-content: center;}
-    .modal-bg.active { display: flex;}
-    .modal-content { background: var(--card-bg); color: var(--accent); border-radius: 18px; border: 2px solid var(--primary); box-shadow: 0 7px 32px #42a5f547; padding: 28px 30px 22px 30px; display: flex; flex-direction: column; align-items: center; min-width: 270px; max-width: 95vw; min-height: 135px; font-family: 'Poppins', Arial, sans-serif; animation: pop .18s cubic-bezier(.45,1.4,.68,1.02); position: relative;}
-    .modal-title { font-size: 1.12em; font-weight: 700; color: #fff; margin-bottom: 9px; text-align: center; letter-spacing: 0.02em;}
-    .modal-details { margin-bottom: 16px; color: var(--accent); font-size: 1em; font-weight: 500; text-align: center; word-break: break-word;}
-    .modal-done-btn { background: var(--primary); color: #fff; border: none; border-radius: 10px; font-size: 1.01em; font-weight: 700; padding: 10px 34px; cursor: pointer; transition: background 0.18s; margin-top: 2px; font-family: inherit; box-shadow: 0 2px 8px #42a5f533; letter-spacing: 0.03em;}
-    .modal-done-btn:hover { background: var(--primary-hover);}
-    .modal-close { position: absolute; top: 11px; right: 16px; background: none; border: none; color: #bbdefb; font-size: 1.22em; cursor: pointer; padding: 0; border-radius: 50%; transition: background 0.12s;}
-    .modal-close:active { background: #212a40;}
-    @keyframes pop { from { transform: scale(0.91); opacity: 0.3;} to   { transform: scale(1);    opacity: 1;} }
-    .modal-confirm { background: var(--card-bg); color: var(--accent); border-radius: 18px; border: 2px solid var(--red); box-shadow: 0 7px 32px #ff3b3047; padding: 22px 24px 18px 24px; display: flex; flex-direction: column; align-items: center; min-width: 230px; max-width: 95vw; min-height: 80px; font-family: 'Poppins', Arial, sans-serif; position: relative; animation: pop .18s cubic-bezier(.45,1.4,.68,1.02);}
-    .modal-confirm-title { font-size: 1.09em; font-weight: 700; color: #fff; margin-bottom: 9px; text-align: center; letter-spacing: 0.02em;}
-    .modal-confirm-details { margin-bottom: 16px; color: var(--accent); font-size: 1em; font-weight: 500; text-align: center; word-break: break-word;}
-    .modal-confirm-btns { display: flex; gap: 18px; margin-top: 5px;}
-    .modal-confirm-btn { background: var(--red); color: #fff; border: none; border-radius: 10px; font-size: 1.01em; font-weight: 700; padding: 7px 22px; cursor: pointer; transition: background 0.18s; font-family: inherit; box-shadow: 0 2px 8px #ff3b3033; letter-spacing: 0.03em;}
-    .modal-confirm-btn:hover { background: #c11;}
-    .modal-cancel-btn { background: var(--border); color: #bbdefb; border: none; border-radius: 10px; font-size: 1.01em; font-weight: 700; padding: 7px 22px; cursor: pointer; transition: background 0.18s; font-family: inherit; box-shadow: 0 2px 8px #212a4033; letter-spacing: 0.03em;}
   </style>
 </head>
 <body>
@@ -337,8 +318,8 @@
     <div class="log-board" id="driverBoard"></div>
     <div class="how-to-use" id="howToUse">
       <b>How to use:</b><br>
-      1. Enter your shift's starting kilometers and press <b>Start</b>.<br>
-      2. Enter your ending kilometers and press <b>Stop</b>.<br>
+      1. Enter your shift's starting kilometers and time in, then press <b>Start</b>.<br>
+      2. Enter your ending kilometers and time out, then press <b>Stop</b>.<br>
       3. See your shift summary and review reports.<br>
       <hr>
       <b>Note:</b> Only the logged-in driver can view and log their own shift.
@@ -376,13 +357,11 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script>
-    // Auth check
     const userData = JSON.parse(localStorage.getItem("user") || "null");
     if (!userData) { window.location.href = "login.html"; }
     const isAdmin = userData.role === "admin";
     const currentUser = userData.name;
 
-    // Firebase setup
     const firebaseConfig = {
       apiKey: "AIzaSyCirYQ_46JiSkMIwCNs1nSi89dvB1MUg_A",
       authDomain: "deliverylog12.firebaseapp.com",
@@ -399,7 +378,6 @@
     let allUsers = {};
     let driverState = {};
 
-    // Modal logic (unchanged)
     function showModal(details) {
       document.getElementById('modalDetails').innerHTML = details;
       document.getElementById('modalBg').classList.add('active');
@@ -453,12 +431,6 @@
     }
 
     function pad2(n){return String(n).padStart(2,'0');}
-    function formatTime(sec) {
-      const h = String(Math.floor(sec/3600)).padStart(2,'0');
-      const m = String(Math.floor((sec%3600)/60)).padStart(2,'0');
-      const s = String(sec%60).padStart(2,'0');
-      return `${h}:${m}:${s}`;
-    }
     function toDisplayDate(isoStr) {
       if (!isoStr) return '';
       const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -474,10 +446,10 @@
         if (!driverState[userId]) driverState[userId] = {
           kmIn: "",
           kmOut: "",
+          timeIn: "",
+          timeOut: "",
           running: false,
           date: (new Date()).toISOString().slice(0,10),
-          timer: 0,
-          startTime: null,
           stopped: false
         };
         const s = driverState[userId];
@@ -486,13 +458,11 @@
         const headerRow = document.createElement('div');
         headerRow.className = 'driver-card-header';
 
-        // Green dot for running
         if (s.running) {
           const dot = document.createElement('span');
           dot.className = 'green-dot';
           headerRow.appendChild(dot);
         }
-
         const nameEl = document.createElement('span');
         nameEl.className = 'driver-name';
         nameEl.textContent = userObj.name;
@@ -550,6 +520,8 @@
 
         const fieldsRow = document.createElement('div');
         fieldsRow.className = 'driver-fields-row';
+
+        // KM In
         const kmInLbl = document.createElement('label');
         kmInLbl.textContent = "In";
         const kmInWrap = document.createElement('span');
@@ -558,9 +530,9 @@
         kmIn.type = 'number';
         kmIn.placeholder = 'Start';
         kmIn.value = s.kmIn;
+        kmIn.disabled = s.running;
         kmIn.min = "1";
         kmIn.max = "999999999";
-        kmIn.disabled = s.running;
         kmIn.onfocus = function() {
           kmIn.disabled = false;
         };
@@ -584,9 +556,28 @@
         kmInUnit.textContent = "Km";
         kmInWrap.appendChild(kmIn);
         kmInWrap.appendChild(kmInUnit);
+
+        // Time In
+        const timeInLbl = document.createElement('label');
+        timeInLbl.textContent = "Time In";
+        const timeInWrap = document.createElement('span');
+        timeInWrap.className = 'input-km-wrap';
+        const timeIn = document.createElement('input');
+        timeIn.type = 'time';
+        timeIn.value = s.timeIn;
+        timeIn.disabled = s.running;
+        timeIn.onchange = function(e) {
+          s.timeIn = e.target.value;
+          updateDriverState(userId);
+        };
+        timeInWrap.appendChild(timeIn);
+
         fieldsRow.appendChild(kmInLbl);
         fieldsRow.appendChild(kmInWrap);
+        fieldsRow.appendChild(timeInLbl);
+        fieldsRow.appendChild(timeInWrap);
 
+        // KM Out
         const kmOutLbl = document.createElement('label');
         kmOutLbl.textContent = "Out";
         const kmOutWrap = document.createElement('span');
@@ -595,9 +586,9 @@
         kmOut.type = 'number';
         kmOut.placeholder = 'End';
         kmOut.value = s.kmOut;
+        kmOut.disabled = !s.running;
         kmOut.min = "1";
         kmOut.max = "999999999";
-        kmOut.disabled = !s.running;
         kmOut.onfocus = function() {
           kmOut.disabled = false;
         };
@@ -621,8 +612,27 @@
         kmOutUnit.textContent = "Km";
         kmOutWrap.appendChild(kmOut);
         kmOutWrap.appendChild(kmOutUnit);
+
+        // Time Out
+        const timeOutLbl = document.createElement('label');
+        timeOutLbl.textContent = "Time Out";
+        const timeOutWrap = document.createElement('span');
+        timeOutWrap.className = 'input-km-wrap';
+        const timeOut = document.createElement('input');
+        timeOut.type = 'time';
+        timeOut.value = s.timeOut;
+        timeOut.disabled = !s.running;
+        timeOut.onchange = function(e) {
+          s.timeOut = e.target.value;
+          updateDriverState(userId);
+        };
+        timeOutWrap.appendChild(timeOut);
+
         fieldsRow.appendChild(kmOutLbl);
         fieldsRow.appendChild(kmOutWrap);
+        fieldsRow.appendChild(timeOutLbl);
+        fieldsRow.appendChild(timeOutWrap);
+
         card.appendChild(fieldsRow);
 
         const kmResult = document.createElement('div');
@@ -640,68 +650,48 @@
         renderKmResult();
         card.appendChild(kmResult);
 
-        const timerBar = document.createElement('div');
-        timerBar.className = 'driver-timer-bar';
-        const timerDisplay = document.createElement('span');
-        timerDisplay.className = 'driver-timer';
-        timerDisplay.textContent = formatTime(s.timer);
-        timerBar.appendChild(timerDisplay);
-        card.appendChild(timerBar);
-
         const btns = document.createElement('div');
         btns.className = 'driver-btns';
         const startBtn = document.createElement('button');
         startBtn.innerHTML = `<i class="fas fa-play"></i> Start`;
-        startBtn.disabled = s.running || !s.kmIn || !s.date || s.kmIn.length < 1 || s.kmIn.length > 9;
+        startBtn.disabled = s.running || !s.kmIn || !s.date || !s.timeIn || s.kmIn.length < 1 || s.kmIn.length > 9;
         startBtn.onclick = () => {
           s.running = true;
           s.stopped = false;
-          s.startTime = new Date().toISOString();
-          s.timer = 0;
           updateDriverState(userId);
-          timerDisplay.textContent = formatTime(0);
           startBtn.disabled = true;
           stopBtn.disabled = false;
           kmIn.disabled = true;
+          timeIn.disabled = true;
           kmOut.disabled = false;
-          renderDrivers();
-          if (s.timerInterval) clearInterval(s.timerInterval);
-          s.timerInterval = setInterval(() => {
-            s.timer = Math.floor((Date.now() - new Date(s.startTime).getTime())/1000);
-            timerDisplay.textContent = formatTime(s.timer);
-          }, 1000);
+          timeOut.disabled = false;
+          card.classList.add('active');
         };
         btns.appendChild(startBtn);
 
         const stopBtn = document.createElement('button');
         stopBtn.innerHTML = `<i class="fas fa-stop"></i> Stop`;
         stopBtn.className = "stop-btn";
-        stopBtn.disabled = !s.running || !s.kmOut || s.kmOut.length < 1 || s.kmOut.length > 9;
+        stopBtn.disabled = !s.running || !s.kmOut || !s.timeOut || s.kmOut.length < 1 || s.kmOut.length > 9;
         stopBtn.onclick = () => {
           if (!s.kmOut || Number(s.kmOut) < Number(s.kmIn)) {
             alert("Enter valid ending km (greater than or equal to start)");
             return;
           }
-          if (s.startTime) {
-            s.timer = Math.floor((Date.now() - new Date(s.startTime).getTime())/1000);
+          if (!s.timeOut) {
+            alert("Enter time out");
+            return;
           }
           s.stopped = true;
           s.running = false;
-          s.startTime = null;
           updateDriverState(userId);
-          setTimeout(() => {
-            s.timer = 0;
-            updateDriverState(userId);
-          }, 50);
-          if (s.timerInterval) clearInterval(s.timerInterval);
-          s.timerInterval = null;
           renderKmResult();
           card.classList.remove('active');
           showModal(
             `<b><i class="fas fa-user"></i> ${userObj.name}</b><br>
             <span style="color:#fff;">${toDisplayDate(s.date)}</span><br>
             <span style="color:var(--primary)">Total: ${+s.kmOut - +s.kmIn} km</span><br>
-            <span>Time: ${formatTime(s.timer)}</span>`
+            <span>Time In: ${s.timeIn} &nbsp; Time Out: ${s.timeOut}</span>`
           );
           db.ref("logs").push({
             date: s.date,
@@ -709,11 +699,11 @@
             kmIn: s.kmIn,
             kmOut: s.kmOut,
             totalKm: (+s.kmOut - +s.kmIn).toString(),
-            totalTime: formatTime(s.timer),
+            timeIn: s.timeIn,
+            timeOut: s.timeOut,
             timestamp: new Date().toISOString()
           });
-          s.kmIn = ""; s.kmOut = ""; s.startTime = null; s.stopped = false;
-          timerDisplay.textContent = formatTime(0);
+          s.kmIn = ""; s.kmOut = ""; s.timeIn = ""; s.timeOut = ""; s.stopped = false;
           updateDriverState(userId);
           renderDrivers();
         };
@@ -721,23 +711,6 @@
         card.appendChild(btns);
 
         driverBoard.appendChild(card);
-
-        if (s.running && s.startTime && !s.stopped) {
-          if (!s.timerInterval) {
-            s.timerInterval = setInterval(() => {
-              if (!s.stopped) {
-                s.timer = Math.floor((Date.now() - new Date(s.startTime).getTime())/1000);
-                timerDisplay.textContent = formatTime(s.timer);
-              }
-            }, 1000);
-          }
-        } else {
-          if (s.timerInterval) {
-            clearInterval(s.timerInterval);
-            s.timerInterval = null;
-          }
-          timerDisplay.textContent = formatTime(s.timer || 0);
-        }
       });
     }
 
@@ -749,21 +722,21 @@
         const btns = card.querySelectorAll('.driver-btns button');
         const kmIn = card.querySelector('.driver-fields-row .input-km-wrap input[type="number"]:nth-child(1)');
         const kmOut = card.querySelectorAll('.driver-fields-row .input-km-wrap input[type="number"]')[1];
-        const timerDisplay = card.querySelector('.driver-timer');
+        const timeIn = card.querySelectorAll('.driver-fields-row .input-km-wrap input[type="time"]')[0];
+        const timeOut = card.querySelectorAll('.driver-fields-row .input-km-wrap input[type="time"]')[1];
         if (btns.length === 2) {
-          btns[0].disabled = s.running || !s.kmIn || !s.date || s.kmIn.length < 1 || s.kmIn.length > 9;
-          btns[1].disabled = !s.running || !s.kmOut || s.kmOut.length < 1 || s.kmOut.length > 9;
+          btns[0].disabled = s.running || !s.kmIn || !s.date || !s.timeIn || s.kmIn.length < 1 || s.kmIn.length > 9;
+          btns[1].disabled = !s.running || !s.kmOut || !s.timeOut || s.kmOut.length < 1 || s.kmOut.length > 9;
         }
         if (kmIn) kmIn.disabled = s.running;
         if (kmOut) kmOut.disabled = !s.running;
+        if (timeIn) timeIn.disabled = s.running;
+        if (timeOut) timeOut.disabled = !s.running;
         const kmResult = card.querySelector('.driver-km-result');
         if(kmResult) {
           if(s.kmIn && s.kmOut && !isNaN(+s.kmIn) && !isNaN(+s.kmOut) && +s.kmOut >= +s.kmIn && s.kmIn.length >= 1 && s.kmIn.length <= 9 && s.kmOut.length >= 1 && s.kmOut.length <= 9) {
             kmResult.innerHTML = `<i class="fas fa-road"></i> Today: <span style="font-weight:900;color:var(--primary)">` + (+s.kmOut - +s.kmIn) + ` km</span>`;
           } else { kmResult.textContent = ''; }
-        }
-        if (timerDisplay) {
-          timerDisplay.textContent = formatTime(s.stopped ? 0 : (s.timer || 0));
         }
         if (s.running) card.classList.add('active');
         else card.classList.remove('active');
