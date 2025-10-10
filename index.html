@@ -128,47 +128,6 @@
     .header-btnbar .logout-btn { background: var(--red);}
     .header-btnbar .logout-btn:hover { background: #c11;}
     .header-btnbar .reports-btn { background: var(--primary);}
-    .driver-addbar {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.45em;
-      margin: 13px 0 16px 0;
-      width: 100%;
-      max-width: 600px;
-      padding: 0 3px;
-      align-self: center;
-    }
-    .driver-addbar input[type="text"] {
-      flex: 1;
-      font-size: 1em;
-      padding: 0.55em 1em;
-      background: #212a40;
-      border: none;
-      border-radius: 9px;
-      color: var(--accent);
-      outline: none;
-      font-family: 'Poppins', Arial, sans-serif;
-      font-weight: 600;
-      margin-right: 0.07em;
-    }
-    .driver-addbar button {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 9px;
-      font-size: 0.97rem;
-      font-weight: 700;
-      padding: 7px 18px;
-      cursor: pointer;
-      transition: background 0.16s;
-      font-family: inherit;
-      letter-spacing: 0.01em;
-      display: flex;
-      align-items: center;
-      gap: 0.22em;
-    }
-    .driver-addbar button:hover { background: var(--primary-hover);}
     .log-board {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -201,6 +160,7 @@
       transition: border 0.13s, box-shadow 0.13s;
       width: 100%;
       box-sizing: border-box;
+      overflow: hidden;
     }
     .driver-card.active {
       border: 2.2px solid var(--primary);
@@ -269,8 +229,34 @@
     }
     .driver-card-header .driver-date[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer;}
     .driver-card-header .driver-delete { color: var(--red); font-size: 1.14em; border: none; background: none; cursor: pointer; margin-left: auto; border-radius: 50%; padding: 0.07em 0.36em; transition: background 0.11s; flex-shrink: 0;}
-    .driver-fields-row { display: flex; align-items: center; gap: 0.7em; margin: 13px 0 3px 0; padding: 0 15px; justify-content: stretch;}
-    .driver-fields-row label { font-size: 1em; font-weight: 600; color: #bbdefb; margin-right: 0; padding-right: 0; font-family: inherit; white-space: nowrap;}
+    .driver-fields-row {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      margin: 13px 0 3px 0;
+      padding: 0 15px;
+      justify-content: stretch;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .field-group-row {
+      display: flex;
+      align-items: center;
+      gap: 0.7em;
+      width: 100%;
+      margin-bottom: 0;
+    }
+    .field-group-row label {
+      font-size: 1em;
+      font-weight: 600;
+      color: #bbdefb;
+      margin-right: 0;
+      padding-right: 0;
+      font-family: inherit;
+      white-space: nowrap;
+      min-width: 44px;
+    }
     .input-km-wrap { display: inline-flex; align-items: center; border-radius: 7px; background: #212a40; box-shadow: 0 1px 4px #009de018; margin: 0 0.15em; padding-left: 0.15em; padding-right: 0.2em;}
     .input-km-wrap input[type="number"], .input-km-wrap input[type="time"] { width: 5.5em; font-size: 1.07em; padding: 0.42em 0.12em 0.42em 0.55em; background: #212a40; border: 1px solid #384164; border-radius: 7px 0 0 7px; color: #fff; outline: none; text-align: center; font-family: inherit; font-weight: 700; white-space: nowrap; box-shadow: none;}
     .input-km-wrap .km-unit { font-size: 0.98em; color: #7ec5fd; margin-left: 0.2em; margin-right: 0.3em; font-weight: 700; white-space: nowrap; background: transparent; border: none; padding: 0; pointer-events: none; user-select: none;}
@@ -521,7 +507,9 @@
         const fieldsRow = document.createElement('div');
         fieldsRow.className = 'driver-fields-row';
 
-        // KM In
+        // First row: KM In and KM Out
+        const row1 = document.createElement('div');
+        row1.className = 'field-group-row';
         const kmInLbl = document.createElement('label');
         kmInLbl.textContent = "In";
         const kmInWrap = document.createElement('span');
@@ -557,27 +545,6 @@
         kmInWrap.appendChild(kmIn);
         kmInWrap.appendChild(kmInUnit);
 
-        // Time In
-        const timeInLbl = document.createElement('label');
-        timeInLbl.textContent = "Time In";
-        const timeInWrap = document.createElement('span');
-        timeInWrap.className = 'input-km-wrap';
-        const timeIn = document.createElement('input');
-        timeIn.type = 'time';
-        timeIn.value = s.timeIn;
-        timeIn.disabled = s.running;
-        timeIn.onchange = function(e) {
-          s.timeIn = e.target.value;
-          updateDriverState(userId);
-        };
-        timeInWrap.appendChild(timeIn);
-
-        fieldsRow.appendChild(kmInLbl);
-        fieldsRow.appendChild(kmInWrap);
-        fieldsRow.appendChild(timeInLbl);
-        fieldsRow.appendChild(timeInWrap);
-
-        // KM Out
         const kmOutLbl = document.createElement('label');
         kmOutLbl.textContent = "Out";
         const kmOutWrap = document.createElement('span');
@@ -613,7 +580,30 @@
         kmOutWrap.appendChild(kmOut);
         kmOutWrap.appendChild(kmOutUnit);
 
-        // Time Out
+        row1.appendChild(kmInLbl);
+        row1.appendChild(kmInWrap);
+        row1.appendChild(kmOutLbl);
+        row1.appendChild(kmOutWrap);
+        fieldsRow.appendChild(row1);
+
+        // Second row: Time In and Time Out (below, full width)
+        const row2 = document.createElement('div');
+        row2.className = 'field-group-row';
+        row2.style.marginTop = "2px";
+        const timeInLbl = document.createElement('label');
+        timeInLbl.textContent = "Time In";
+        const timeInWrap = document.createElement('span');
+        timeInWrap.className = 'input-km-wrap';
+        const timeIn = document.createElement('input');
+        timeIn.type = 'time';
+        timeIn.value = s.timeIn;
+        timeIn.disabled = s.running;
+        timeIn.onchange = function(e) {
+          s.timeIn = e.target.value;
+          updateDriverState(userId);
+        };
+        timeInWrap.appendChild(timeIn);
+
         const timeOutLbl = document.createElement('label');
         timeOutLbl.textContent = "Time Out";
         const timeOutWrap = document.createElement('span');
@@ -628,19 +618,20 @@
         };
         timeOutWrap.appendChild(timeOut);
 
-        fieldsRow.appendChild(kmOutLbl);
-        fieldsRow.appendChild(kmOutWrap);
-        fieldsRow.appendChild(timeOutLbl);
-        fieldsRow.appendChild(timeOutWrap);
+        row2.appendChild(timeInLbl);
+        row2.appendChild(timeInWrap);
+        row2.appendChild(timeOutLbl);
+        row2.appendChild(timeOutWrap);
+        fieldsRow.appendChild(row2);
 
         card.appendChild(fieldsRow);
 
         const kmResult = document.createElement('div');
         kmResult.className = 'driver-km-result';
         function renderKmResult() {
-          if(s.kmIn && s.kmOut && 
-             !isNaN(+s.kmIn) && !isNaN(+s.kmOut) && 
-             +s.kmOut >= +s.kmIn && 
+          if(s.kmIn && s.kmOut &&
+             !isNaN(+s.kmIn) && !isNaN(+s.kmOut) &&
+             +s.kmOut >= +s.kmIn &&
              s.kmIn.length >= 1 && s.kmIn.length <= 9 &&
              s.kmOut.length >= 1 && s.kmOut.length <= 9
           ) {
@@ -720,10 +711,10 @@
         const s = driverState[userId];
         if (!s) return;
         const btns = card.querySelectorAll('.driver-btns button');
-        const kmIn = card.querySelector('.driver-fields-row .input-km-wrap input[type="number"]:nth-child(1)');
-        const kmOut = card.querySelectorAll('.driver-fields-row .input-km-wrap input[type="number"]')[1];
-        const timeIn = card.querySelectorAll('.driver-fields-row .input-km-wrap input[type="time"]')[0];
-        const timeOut = card.querySelectorAll('.driver-fields-row .input-km-wrap input[type="time"]')[1];
+        const kmIn = card.querySelector('.field-group-row .input-km-wrap input[type="number"]:nth-child(1)');
+        const kmOut = card.querySelectorAll('.field-group-row .input-km-wrap input[type="number"]')[1];
+        const timeIn = card.querySelectorAll('.field-group-row .input-km-wrap input[type="time"]')[0];
+        const timeOut = card.querySelectorAll('.field-group-row .input-km-wrap input[type="time"]')[1];
         if (btns.length === 2) {
           btns[0].disabled = s.running || !s.kmIn || !s.date || !s.timeIn || s.kmIn.length < 1 || s.kmIn.length > 9;
           btns[1].disabled = !s.running || !s.kmOut || !s.timeOut || s.kmOut.length < 1 || s.kmOut.length > 9;
